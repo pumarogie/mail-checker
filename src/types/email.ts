@@ -19,7 +19,7 @@ export interface ValidationOptions {
 export interface EmailValidationResult {
   email: string;
   valid: boolean;
-  deliverable: 'deliverable' | 'undeliverable' | 'unknown';
+  deliverable: "deliverable" | "undeliverable" | "unknown";
   domain_info: DomainInfo;
   reason: string;
   checks: {
@@ -51,7 +51,7 @@ export interface BatchValidationResult {
   valid_count: number;
   invalid_count: number;
   results: EmailValidationResult[];
-  file_info: FileProcessingResult['file_info'];
+  file_info: FileProcessingResult["file_info"];
   processing_stats: {
     started_at: number;
     completed_at: number;
@@ -60,7 +60,7 @@ export interface BatchValidationResult {
   };
 }
 
-export type SupportedFileType = 'xlsx' | 'xls' | 'csv' | 'pdf';
+export type SupportedFileType = "xlsx" | "xls" | "csv" | "pdf";
 
 export interface FileTypeInfo {
   extension: string;
@@ -71,7 +71,12 @@ export interface FileTypeInfo {
 
 export interface ValidationError {
   email: string;
-  error_type: 'format_error' | 'domain_error' | 'mx_error' | 'smtp_error' | 'timeout_error';
+  error_type:
+    | "format_error"
+    | "domain_error"
+    | "mx_error"
+    | "smtp_error"
+    | "timeout_error";
   message: string;
   details?: Record<string, unknown>;
 }

@@ -7,7 +7,7 @@ A production-ready email validation service built with Next.js, featuring Stripe
 - **Single Email Validation** - Validate individual email addresses with detailed results
 - **Bulk Validation** - Process Excel/CSV files containing multiple emails
 - **Stripe-like API** - Professional RESTful API with consistent response formats
-- **DNS Validation** - Check domain existence and MX record availability  
+- **DNS Validation** - Check domain existence and MX record availability
 - **File Processing** - Support for .xlsx, .xls, and .csv file formats
 - **Rate Limiting** - Built-in protections against abuse
 - **Caching** - DNS result caching for improved performance
@@ -48,11 +48,13 @@ pnpm start
 All API endpoints return JSON responses with consistent Stripe-like formatting.
 
 ### Base URL
+
 ```
 http://localhost:3000/api/v1
 ```
 
 ### Authentication
+
 Currently no authentication required. API keys can be implemented for production use.
 
 ---
@@ -64,6 +66,7 @@ Currently no authentication required. API keys can be implemented for production
 Validate a single email address.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -75,6 +78,7 @@ Validate a single email address.
 ```
 
 **Response:**
+
 ```json
 {
   "object": "email",
@@ -108,6 +112,7 @@ Alternative GET endpoint for simple validation.
 Upload and validate emails from Excel/CSV files.
 
 **Request:**
+
 ```bash
 curl -X POST \
   -F "file=@emails.xlsx" \
@@ -115,6 +120,7 @@ curl -X POST \
 ```
 
 **Response:**
+
 ```json
 {
   "object": "batch_result",
@@ -155,6 +161,7 @@ curl -X POST \
 Get information about batch processing limits and supported formats.
 
 **Response:**
+
 ```json
 {
   "object": "batch_info",
@@ -164,7 +171,9 @@ Get information about batch processing limits and supported formats.
     "max_emails_per_batch": 100
   },
   "mime_types": {
-    "xlsx": ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+    "xlsx": [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ],
     "xls": ["application/vnd.ms-excel"],
     "csv": ["text/csv", "application/csv"]
   }
@@ -190,12 +199,14 @@ All errors follow a consistent format:
 ```
 
 ### Error Types
+
 - `api_error` - Server errors
-- `invalid_request_error` - Client errors  
+- `invalid_request_error` - Client errors
 - `validation_error` - Input validation failures
 - `rate_limit_error` - Too many requests
 
 ### HTTP Status Codes
+
 - `200` - Success
 - `400` - Bad Request
 - `422` - Validation Error
@@ -238,11 +249,13 @@ src/
 ## 📝 Supported File Formats
 
 ### Excel Files
+
 - `.xlsx` - Excel 2007+ format
 - `.xls` - Legacy Excel format
 - `.csv` - Comma-separated values
 
 ### File Requirements
+
 - Maximum file size: 10MB
 - Maximum emails per batch: 100 (free tier)
 - Emails can be in any column or cell
@@ -267,6 +280,7 @@ LOG_LEVEL=info
 ```
 
 ### Rate Limiting
+
 - 60 requests per minute per IP
 - Burst limit of 10 requests
 - Automatic backoff for DNS lookups

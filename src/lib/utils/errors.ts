@@ -1,6 +1,6 @@
-import { ZodError } from 'zod';
-import { ApiError, ApiErrorType } from '@/types/api';
-import { ERROR_CODES, HTTP_STATUS } from '@/lib/constants';
+import { ZodError } from "zod";
+import { ApiError, ApiErrorType } from "@/types/api";
+import { ERROR_CODES, HTTP_STATUS } from "@/lib/constants";
 
 export class AppError extends Error {
   public readonly type: ApiErrorType;
@@ -13,15 +13,15 @@ export class AppError extends Error {
     code: string,
     message: string,
     statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR,
-    param?: string
+    param?: string,
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = "AppError";
     this.type = type;
     this.code = code;
     this.statusCode = statusCode;
     this.param = param;
-    
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, AppError);
     }
@@ -30,76 +30,104 @@ export class AppError extends Error {
 
 export class ValidationError extends AppError {
   constructor(message: string, param?: string) {
-    super('validation_error', ERROR_CODES.INVALID_EMAIL_FORMAT, message, HTTP_STATUS.UNPROCESSABLE_ENTITY, param);
-    this.name = 'ValidationError';
+    super(
+      "validation_error",
+      ERROR_CODES.INVALID_EMAIL_FORMAT,
+      message,
+      HTTP_STATUS.UNPROCESSABLE_ENTITY,
+      param,
+    );
+    this.name = "ValidationError";
   }
 }
 
 export class FileProcessingError extends AppError {
   constructor(code: string, message: string, param?: string) {
-    super('invalid_request_error', code, message, HTTP_STATUS.BAD_REQUEST, param);
-    this.name = 'FileProcessingError';
+    super(
+      "invalid_request_error",
+      code,
+      message,
+      HTTP_STATUS.BAD_REQUEST,
+      param,
+    );
+    this.name = "FileProcessingError";
   }
 }
 
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Too many requests') {
-    super('rate_limit_error', ERROR_CODES.RATE_LIMIT_EXCEEDED, message, HTTP_STATUS.TOO_MANY_REQUESTS);
-    this.name = 'RateLimitError';
+  constructor(message: string = "Too many requests") {
+    super(
+      "rate_limit_error",
+      ERROR_CODES.RATE_LIMIT_EXCEEDED,
+      message,
+      HTTP_STATUS.TOO_MANY_REQUESTS,
+    );
+    this.name = "RateLimitError";
   }
 }
 
 export class DomainError extends AppError {
   constructor(_domain: string, message: string) {
-    super('validation_error', ERROR_CODES.DOMAIN_NOT_FOUND, message, HTTP_STATUS.UNPROCESSABLE_ENTITY, 'domain');
-    this.name = 'DomainError';
+    super(
+      "validation_error",
+      ERROR_CODES.DOMAIN_NOT_FOUND,
+      message,
+      HTTP_STATUS.UNPROCESSABLE_ENTITY,
+      "domain",
+    );
+    this.name = "DomainError";
   }
 }
 
-export const createValidationError = (message: string, param?: string): ValidationError => {
+export const createValidationError = (
+  message: string,
+  param?: string,
+): ValidationError => {
   return new ValidationError(message, param);
 };
 
-export const createFileError = (type: 'size' | 'format' | 'extraction' | 'empty', details?: string): FileProcessingError => {
+export const createFileError = (
+  type: "size" | "format" | "extraction" | "empty",
+  details?: string,
+): FileProcessingError => {
   switch (type) {
-    case 'size':
+    case "size":
       return new FileProcessingError(
         ERROR_CODES.FILE_TOO_LARGE,
-        'File size exceeds the maximum allowed limit',
-        'file'
+        "File size exceeds the maximum allowed limit",
+        "file",
       );
-    case 'format':
+    case "format":
       return new FileProcessingError(
         ERROR_CODES.UNSUPPORTED_FORMAT,
-        `Unsupported file format. ${details || 'Please use Excel (.xlsx, .xls, .csv) files.'}`,
-        'file'
+        `Unsupported file format. ${details || "Please use Excel (.xlsx, .xls, .csv) files."}`,
+        "file",
       );
-    case 'extraction':
+    case "extraction":
       return new FileProcessingError(
         ERROR_CODES.EXTRACTION_FAILED,
-        `Failed to extract emails from file. ${details || ''}`.trim(),
-        'file'
+        `Failed to extract emails from file. ${details || ""}`.trim(),
+        "file",
       );
-    case 'empty':
+    case "empty":
       return new FileProcessingError(
         ERROR_CODES.NO_EMAILS_FOUND,
-        'No email addresses found in the uploaded file',
-        'file'
+        "No email addresses found in the uploaded file",
+        "file",
       );
     default:
       return new FileProcessingError(
         ERROR_CODES.INTERNAL_ERROR,
-        'Unknown file processing error',
-        'file'
+        "Unknown file processing error",
+        "file",
       );
   }
 };
 
-
 export const toApiError = (error: unknown): ApiError => {
   if (error instanceof AppError) {
     return {
-      object: 'error',
+      object: "error",
       type: error.type,
       code: error.code,
       message: error.message,
@@ -110,29 +138,29 @@ export const toApiError = (error: unknown): ApiError => {
   if (error instanceof ZodError) {
     const firstIssue = error.issues[0];
     return {
-      object: 'error',
-      type: 'invalid_request_error',
-      code: 'invalid_parameters',
+      object: "error",
+      type: "invalid_request_error",
+      code: "invalid_parameters",
       message: firstIssue.message,
-      param: firstIssue.path.join('.'),
+      param: firstIssue.path.join("."),
     };
   }
 
   if (error instanceof Error) {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === "production";
     return {
-      object: 'error',
-      type: 'api_error',
+      object: "error",
+      type: "api_error",
       code: ERROR_CODES.INTERNAL_ERROR,
-      message: isProduction ? 'An internal error occurred' : error.message,
+      message: isProduction ? "An internal error occurred" : error.message,
     };
   }
 
   return {
-    object: 'error',
-    type: 'api_error',
+    object: "error",
+    type: "api_error",
     code: ERROR_CODES.INTERNAL_ERROR,
-    message: 'An unknown error occurred',
+    message: "An unknown error occurred",
   };
 };
 
@@ -148,22 +176,25 @@ export const getErrorStatusCode = (error: unknown): number => {
   return HTTP_STATUS.INTERNAL_SERVER_ERROR;
 };
 
-export const logError = (error: unknown, context?: Record<string, unknown>): void => {
+export const logError = (
+  error: unknown,
+  context?: Record<string, unknown>,
+): void => {
   const errorInfo = {
-    message: error instanceof Error ? error.message : 'Unknown error',
+    message: error instanceof Error ? error.message : "Unknown error",
     stack: error instanceof Error ? error.stack : undefined,
-    type: error instanceof AppError ? error.type : 'unknown',
+    type: error instanceof AppError ? error.type : "unknown",
     code: error instanceof AppError ? error.code : undefined,
     context,
     timestamp: new Date().toISOString(),
   };
 
-  console.error('API Error:', JSON.stringify(errorInfo, null, 2));
+  console.error("API Error:", JSON.stringify(errorInfo, null, 2));
 };
 
 export const isRetryableError = (error: unknown): boolean => {
   if (error instanceof AppError) {
-    return error.type === 'api_error' && error.statusCode >= 500;
+    return error.type === "api_error" && error.statusCode >= 500;
   }
   return false;
 };
