@@ -1,4 +1,4 @@
-# Email Validator API
+# Email Checker
 
 A production-ready email validation service built with Next.js, featuring Stripe-like RESTful APIs for single and bulk email validation. Validate email addresses without sending emails by checking format, domain existence, and MX records.
 
