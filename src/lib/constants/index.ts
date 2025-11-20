@@ -14,8 +14,8 @@ export const API_CONFIG = {
 
 export const FILE_LIMITS = {
   MAX_FILE_SIZE_MB: 10,
-  MAX_EMAILS_PER_BATCH: 1000,
-  MAX_EMAILS_FREE_TIER: 100,
+  MAX_EMAILS_PER_BATCH: 100000,
+  MAX_EMAILS_FREE_TIER: 100000,
   SUPPORTED_FORMATS: ["xlsx", "xls", "csv"] as const,
   MIME_TYPES: {
     xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
