@@ -1,6 +1,6 @@
-# Email Checker
+# Email Checker (Work in Progress)
 
-A production-ready email validation service built with Next.js, featuring Stripe-like RESTful APIs for single and bulk email validation. Validate email addresses without sending emails by checking format, domain existence, and MX records.
+A almost production-ready email validation service built with Next.js, featuring Stripe-like RESTful APIs for single and bulk email validation. Validate email addresses without sending emails by checking format, domain existence, and MX records.
 
 ## ✨ Features
 
