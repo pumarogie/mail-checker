@@ -46,6 +46,12 @@ export interface FileProcessingResult {
   };
 }
 
+export interface ExcelFileInfo {
+  filename: string;
+  data: string;
+  size: number;
+}
+
 export interface BatchValidationResult {
   total_count: number;
   valid_count: number;
@@ -58,6 +64,7 @@ export interface BatchValidationResult {
     processing_time_ms: number;
     truncated: boolean;
   };
+  excel_file?: ExcelFileInfo;
 }
 
 export type SupportedFileType = "xlsx" | "xls" | "csv" | "pdf";
