@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import * as path from "path";
+import * as os from "os";
 import { FileProcessorService } from "@/lib/services/file-processor";
 import {
   createBatchSuccessResponse,
@@ -9,11 +12,20 @@ import {
 } from "@/lib/utils/response";
 import { logError, ValidationError } from "@/lib/utils/errors";
 import { FILE_LIMITS } from "@/lib/constants";
+import {
+  generateExcelFile,
+  type ValidationResult
+} from "@/lib/services/excel-generator";
+import {
+  createTempTxtFile,
+  deleteTempTxtFile
+} from "@/lib/services/txt-generator";
 
 const fileProcessor = new FileProcessorService();
 
 export async function POST(request: NextRequest) {
   const requestId = generateRequestId();
+  let tempTxtFilePath: string | null = null;
 
   try {
     const formData = await request.formData();
@@ -23,9 +35,44 @@ export async function POST(request: NextRequest) {
       throw new ValidationError("File is required", "file");
     }
 
+    // Process and validate the file
     const result = await fileProcessor.processAndValidateFile(file);
 
-    const response = createBatchSuccessResponse(result, file.name, file.size);
+    // Create temporary txt file with cleaned emails
+    const txtFileResult = await createTempTxtFile({
+      emails: result.results.map(r => r.email),
+      prefix: 'validation-emails'
+    });
+    tempTxtFilePath = txtFileResult.filePath;
+
+    // Convert validation results to Excel format
+    const excelData: ValidationResult[] = result.results.map(r => ({
+      email: r.email,
+      status: r.valid ? 'Valid' : 'Invalid'
+    }));
+
+    // Generate Excel file
+    const excelBuffer = generateExcelFile({ results: excelData });
+
+    // Generate unique file ID for download
+    const fileId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+
+    // Save Excel file to temp directory
+    const tempDir = os.tmpdir();
+    const tempExcelPath = path.join(tempDir, `excel-${fileId}.xlsx`);
+    await fs.writeFile(tempExcelPath, excelBuffer);
+
+    // Generate download URL
+    const downloadUrl = `/api/v1/emails/batch/download?id=${fileId}`;
+
+    // Return JSON response with download URL instead of base64
+    const responseData = {
+      ...result,
+      excel_download_url: downloadUrl,
+      excel_file_id: fileId,
+    };
+
+    const response = createBatchSuccessResponse(responseData, file.name, file.size);
     return addTracingHeaders(response, requestId);
   } catch (error) {
     logError(error, {
@@ -36,6 +83,11 @@ export async function POST(request: NextRequest) {
 
     const response = createErrorResponse(error);
     return addTracingHeaders(response, requestId);
+  } finally {
+    // Clean up temporary txt file
+    if (tempTxtFilePath) {
+      await deleteTempTxtFile(tempTxtFilePath);
+    }
   }
 }
 

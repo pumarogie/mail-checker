@@ -13,7 +13,7 @@ export const API_CONFIG = {
 } as const;
 
 export const FILE_LIMITS = {
-  MAX_FILE_SIZE_MB: 10,
+  MAX_FILE_SIZE_MB: 100,
   MAX_EMAILS_PER_BATCH: 100000,
   MAX_EMAILS_FREE_TIER: 100000,
   SUPPORTED_FORMATS: ["xlsx", "xls", "csv"] as const,
@@ -60,9 +60,9 @@ export const HTTP_STATUS = {
 } as const;
 
 export const BATCH_CONFIG = {
-  CHUNK_SIZE: 5,
-  DELAY_BETWEEN_CHUNKS_MS: 100,
-  MAX_CONCURRENT_DNS_LOOKUPS: 10,
+  CHUNK_SIZE: 25,
+  DELAY_BETWEEN_CHUNKS_MS: 10,
+  MAX_CONCURRENT_DNS_LOOKUPS: 25,
   RETRY_ATTEMPTS: 2,
   RETRY_DELAY_MS: 1000,
 } as const;
